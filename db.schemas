@@ -1,0 +1,56 @@
+model User {
+  id       String  @id @unique @default(cuid())
+  username String  @unique
+  password String
+  avatarId String?
+  role     Role
+}
+
+model Avatar {
+  id       String  @id @unique @default(cuid())
+  ImageUrl String?
+  name     String?
+}
+
+model Element {
+  id       String @id @unique @default(cuid())
+  width    Int
+  height   Int
+  imageUrl String
+}
+
+model Space {
+  id        String  @id @unique @default(cuid())
+  name      String
+  width     Int
+  height    Int
+  thumbnail String?
+}
+
+model Map {
+  id     String @id @unique @default(cuid())
+  height Int
+  width  Int
+  name   String
+}
+
+model mapElements {
+  id        String  @id @unique @default(cuid())
+  mapId     String
+  elementId String?
+  x         Int?
+  y         Int?
+}
+
+model spaceElements {
+  id        String @id @unique @default(cuid())
+  elemnetId String
+  spaceId   String
+  x         Int
+  y         Int
+}
+
+enum Role {
+  Admin
+  User
+}
