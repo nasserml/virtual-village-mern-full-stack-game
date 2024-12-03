@@ -44,7 +44,7 @@ model mapElements {
 
 model spaceElements {
   id        String @id @unique @default(cuid())
-  elemnetId String
+  elementId String
   spaceId   String
   x         Int
   y         Int
