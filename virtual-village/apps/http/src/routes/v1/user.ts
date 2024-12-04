@@ -15,24 +15,32 @@ userRouter.post("/metadata", userMiddleware, async (req, res) => {
     return;
   }
 
-  await client.user.update({
-    where: {
-      id: req.userId,
-    },
-    data: {
-      avatarId: parsedData.data.avatarId,
-    },
-  });
-
-  res.json({
-    message: "Metadata updated",
-  });
+  try {
+    await client.user.update({
+        where: {
+          id: req.userId,
+        },
+        data: {
+          avatarId: parsedData.data.avatarId,
+        },
+      });
+    
+      res.json({
+        message: "Metadata updated",
+      });
+    
+  } catch (error) {
+    res.status(400).json({
+      message: "Error updating metadata",
+    })
+    
+  }
+  
 });
 
 userRouter.get("/metadata/bulk", async (req, res) => {
   const userIdsString = req.query.ids as string;
   const userIds = userIdsString.slice(1, userIdsString.length - 1).split(",");
-  console.log(userIds);
 
   const metadata = await client.user.findMany({
     where: {

@@ -10,8 +10,9 @@ import {
 import client from "@repo/db/client";
 
 export const adminRouter = Router();
+adminRouter.use(adminMiddleware);
 
-adminRouter.post("/element", adminMiddleware, async (req, res) => {
+adminRouter.post("/element",  async (req, res) => {
   const parsedData = CreateElementSchema.safeParse(req.body);
   if (!parsedData.success) {
     res.status(400).json({
@@ -36,6 +37,8 @@ adminRouter.post("/element", adminMiddleware, async (req, res) => {
 
 adminRouter.put("/element/:elementId", async (req, res) => {
   const parsedData = UpdateElementSchema.safeParse(req.body);
+  console.log("---------------------------------------", )
+  console.log(parsedData)
 
   if (!parsedData.success) {
     res.status(400).json({
@@ -79,12 +82,13 @@ adminRouter.post("/avatar", async (req, res) => {
 adminRouter.post("/map", async (req, res) => {
   const parsedData = CreateMapSchema.safeParse(req.body);
 
+
   if (!parsedData.success) {
     res.status(400).json({
       message: "Validation failed",
     });
     return;
-  }
+  } 
   const map = await client.map.create({
     data: {
       name: parsedData.data.name,
