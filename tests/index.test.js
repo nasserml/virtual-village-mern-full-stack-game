@@ -46,7 +46,7 @@ const BACKEND_URL = "http://localhost:3000";
 const WS_URL = "ws://localhost:3001";
 
 // Authentication
-describe.skip("Authentication", () => {
+describe("Authentication", () => {
   test("User is able to sign up only once ", async () => {
     const username = "Naser-" + Math.random();
     const password = "1234456";
@@ -130,7 +130,7 @@ describe.skip("Authentication", () => {
 });
 
 /// User metadata endpoint
-describe.skip("User metadata endpoint", () => {
+describe("User metadata endpoint", () => {
   //
   let token = "";
   let avatarId = "";
@@ -226,7 +226,7 @@ describe.skip("User metadata endpoint", () => {
 ///
 
 // User avatar
-describe.skip("user avatar information", () => {
+describe("user avatar information", () => {
   //
   let token;
   let avatarId;
@@ -297,7 +297,7 @@ describe.skip("user avatar information", () => {
 //
 
 // Space information
-describe.skip("Space information", () => {
+describe("Space information", () => {
   let mapId;
   let element1Id;
   let element2Id;
@@ -599,7 +599,7 @@ describe.skip("Space information", () => {
 });
 
 // Arena endpoints
-describe.skip("Arena endpoints", () => {
+describe("Arena endpoints", () => {
   let mapId;
   let element1Id;
   let element2Id;
@@ -1062,7 +1062,7 @@ describe("Admin End Points", () => {
 
 //  web sockets tests
 
-describe.skip("Websocket tests", ()=>{
+describe("Websocket tests", ()=>{
 
   let adminToken;
   let adminUserId;
