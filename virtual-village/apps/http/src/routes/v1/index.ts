@@ -6,7 +6,7 @@ import { SigninSchema, SignupSchema } from "../../types";
 import client from "@repo/db/client";
 import jwt from "jsonwebtoken";
 import { JWT_PASSWORD } from "../../config";
-import { hash , compare } from "../../scrypt";
+import { hash, compare } from "../../scrypt";
 
 export const router = Router();
 
@@ -22,7 +22,7 @@ router.post("/signup", async (req, res) => {
     return;
   }
 
-  const hashedPassword = await hash(parsedData.data.password,);
+  const hashedPassword = await hash(parsedData.data.password);
 
   try {
     const user = await client.user.create({
@@ -85,26 +85,45 @@ router.post("/signin", async (req, res) => {
         userId: user.id,
         role: user.role,
       },
-     JWT_PASSWORD
-     
+      JWT_PASSWORD
     );
 
     res.status(200).json({
-      token: token
-    })
+      token: token,
+    });
   } catch (error) {
     res.status(500).json({
       message: "something went wrong internal server error",
     });
     console.log(error);
-    return
+    return;
   }
-
 });
 
-router.get("/elements", (req, res) => {});
+router.get("/elements", async (req, res) => {
+  const elements = await client.element.findMany();
 
-router.get("/avatars", (req, res) => {});
+  res.json({
+    elements: elements.map((e) => ({
+      id: e.id,
+      imageUrl: e.imageUrl,
+      width: e.width,
+      height: e.height,
+      static: e.static,
+    })),
+  });
+});
+
+router.get("/avatars", async (req, res) => {
+  const avatars = await client.avatar.findMany();
+  res.json({
+    avatars: avatars.map((x) => ({
+      id: x.id,
+      imageUrl: x.ImageUrl,
+      name: x.name,
+    })),
+  });
+});
 
 router.use("/user", userRouter);
 router.use("/admin", adminRouter);

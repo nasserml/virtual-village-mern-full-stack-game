@@ -66,6 +66,7 @@ model Map {
   height      Int
   width       Int
   name        String
+  thumbnail   String
   mapElements MapElements[]
 }
 
