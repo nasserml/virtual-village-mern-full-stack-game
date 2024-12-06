@@ -492,7 +492,6 @@ describe("Space information", () => {
       }
     );
 
-
     expect(response.status).toBe(400);
 
     //
@@ -776,10 +775,10 @@ describe("Arena endpoints", () => {
     const deleteResponse = await axios.delete(
       `${BACKEND_URL}/api/v1/space/element`,
       {
-       data:{ id: response.data.elements[0].id,},
-       headers: {
-        authorization: `Bearer ${userToken}`,
-      },
+        data: { id: response.data.elements[0].id },
+        headers: {
+          authorization: `Bearer ${userToken}`,
+        },
       }
     );
 
@@ -1021,9 +1020,9 @@ describe("Admin End Points", () => {
 
   //
 
-  test("Admin is able to update the imageUrl for an element", async()=>{
-
-    const elementResponse = await axios.post( `${BACKEND_URL}/api/v1/admin/element`,
+  test("Admin is able to update the imageUrl for an element", async () => {
+    const elementResponse = await axios.post(
+      `${BACKEND_URL}/api/v1/admin/element`,
       {
         imageUrl:
           "https://images.unsplash.com/photo-1728887823143-d92d2ebbb53a?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -1035,7 +1034,8 @@ describe("Admin End Points", () => {
         headers: {
           authorization: `Bearer ${adminToken}`,
         },
-      })
+      }
+    );
 
     const updateElementResponse = await axios.put(
       `${BACKEND_URL}/api/v1/admin/element/${elementResponse.data.id}`,
@@ -1053,7 +1053,7 @@ describe("Admin End Points", () => {
     expect(updateElementResponse.status).toBe(200);
 
     //
-  })
+  });
 
   //
 
@@ -1062,8 +1062,7 @@ describe("Admin End Points", () => {
 
 //  web sockets tests
 
-describe("Websocket tests", ()=>{
-
+describe("Websocket tests", () => {
   let adminToken;
   let adminUserId;
   let userToken;
@@ -1083,51 +1082,61 @@ describe("Websocket tests", ()=>{
 
   //
   function waitForAndPopulatesMessage(messageArray) {
-    return new Promise( r=> {
-      if(messageArray.length > 0) {
+    return new Promise((resolve) => {
+      if (messageArray.length > 0) {
         resolve(messageArray.shift());
       } else {
-        let interval = setInterval(()=> {
-
-          if(messageArray.length > 0) {
-            resolve(messageArray.shift())
-            clearInterval(interval)
+        let interval = setInterval(() => {
+          if (messageArray.length > 0) {
+            resolve(messageArray.shift());
+            clearInterval(interval);
           }
-        }, 100)
+        }, 100);
       }
-    })
+    });
   }
 
   //
-  async function setupHTTP(){
-
+  async function setupHTTP() {
     const username = `Naser-${Math.random()}`;
     const password = "123456";
 
-    const adminSignupResponse = axios.post(`${BACKEND_URL}/api/v1/signup`, {
-      username,
-      password,
-      role: "admin",
-    });
+    const adminSignupResponse = await axios.post(
+      `${BACKEND_URL}/api/v1/signup`,
+      {
+        username,
+        password,
+        type: "admin",
+      }
+    );
 
-    const adminSigninResponse = axios.post(`${BACKEND_URL}/api/v1/signin`, {
-      username,
-      password,
-    });
+    const adminSigninResponse = await axios.post(
+      `${BACKEND_URL}/api/v1/signin`,
+      {
+        username,
+        password,
+      }
+    );
 
     adminUserId = adminSignupResponse.data.userId;
     adminToken = adminSigninResponse.data.token;
 
-    const userSignupResponse = axios.post(`${BACKEND_URL}/api/v1/signup`, {
-      username: username + "-user",
-      password,
-      role: "user",
-    });
+    const userSignupResponse = await axios.post(
+      `${BACKEND_URL}/api/v1/signup`,
+      {
+        username: username + "-user",
+        password,
+        type: "user",
+      }
+    );
 
-    const userSigninResponse = axios.post(`${BACKEND_URL}/api/v1/signin`, {
-      username: username + "-user",
-      password,
-    });
+    const userSigninResponse = await axios.post(
+      `${BACKEND_URL}/api/v1/signin`,
+      {
+        username: username + "-user",
+        password,
+      }
+    );
 
     userId = userSignupResponse.data.userId;
     userToken = userSigninResponse.data.token;
@@ -1220,26 +1229,34 @@ describe("Websocket tests", ()=>{
   }
 
   //
-  async function setupWs(){
+  async function setupWs() {
     ws1 = new WebSocket(WS_URL);
-
-    await new Promise( r => {
-      ws1.onopen = r
-    })
 
     ws1.onmessage = (event) => {
       ws1Messages.push(JSON.parse(event.data));
-    }
+    
+      console.log(event.data);
+    };
+    
+    await new Promise((r) => {
+      ws1.onopen = r;
+    });
+    
+    
+   
 
     ws2 = new WebSocket(WS_URL);
 
-    await new Promise( r => {
-      ws2.onopen = r
-    })
-
     ws2.onmessage = (event) => {
       ws2Messages.push(JSON.parse(event.data));
-    }
+      console.log(event.data);
+    };
+
+    await new Promise((r) => {
+      ws2.onopen = r;
+    });
+
+   
 
     //
 
@@ -1248,32 +1265,36 @@ describe("Websocket tests", ()=>{
 
   //
 
-  beforeAll(async()=>{
-
+  beforeAll(async () => {
     await setupHTTP();
     await setupWs();
+
 
   });
   //
 
-  test("Get back ack for joining the space", async()=>{
-    ws1.send(JSON.stringify({
-      "type": "join",
-      "payload": {
-        "spaceId": spaceId,
-        "token":adminToken
-      }
-    }));
+  test("Get back ack for joining the space", async () => {
+    ws1.send(
+      JSON.stringify({
+        type: "join",
+        payload: {
+          spaceId: spaceId,
+          token: adminToken,
+        },
+      })
+    );
 
     const message1 = await waitForAndPopulatesMessage(ws1Messages);
 
-    ws1.send(JSON.stringify({
-      "type": "join",
-      "payload": {
-        "spaceId": spaceId,
-        "token":userToken
-      }
-    }));
+    ws2.send(
+      JSON.stringify({
+        type: "join",
+        payload: {
+          spaceId: spaceId,
+          token: userToken,
+        },
+      })
+    );
 
     const message2 = await waitForAndPopulatesMessage(ws2Messages);
     const message3 = await waitForAndPopulatesMessage(ws1Messages);
@@ -1283,8 +1304,8 @@ describe("Websocket tests", ()=>{
 
     expect(message1.payload.users.length).toBe(0);
     expect(message2.payload.users.length).toBe(1);
-    expect(message3.type).toBe("user-join");
-    expect(message3.payload.x).toBe(message2.payload.spawn.x)
+    expect(message3.type).toBe("user-joined");
+    expect(message3.payload.x).toBe(message2.payload.spawn.x);
     expect(message3.payload.y).toBe(message2.payload.spawn.y);
     expect(message3.payload.userId).toBe(userId);
 
@@ -1295,79 +1316,85 @@ describe("Websocket tests", ()=>{
     userY = message2.payload.spawn.y;
 
     //
-  })
+  });
 
   //
 
-  test("User should not be able to move across the boundary of the wall", async()=> {
-    ws1.send(JSON.stringify({
-      type: "movement",
-      payload: {
-        x: 10000,
-        y: 100000
-      }
-    }));
-
-    const message =  await waitForAndPopulatesMessage(ws1Messages);
-
-    expect(message.type).toBe("movement-rejected");
-    expect(message.payload.x).toBe(adminX);
-    expect(message.payload.y).toBe(adminY);
-
-    //
-  })
-
-  //
-  test("User should not be able to move two blocks at the same time", async()=> {
-    ws1.send(JSON.stringify({
-      type: "movement",
-      payload: {
-        x: adminX + 2 ,
-        y: adminY
-      }
-    }));
-
-    const message =  await waitForAndPopulatesMessage(ws1Messages);
-
-    expect(message.type).toBe("movement-rejected");
-    expect(message.payload.x).toBe(adminX);
-    expect(message.payload.y).toBe(adminY);
-
-    //
-  })
-
-  //
-    //
-    test("Correct movement should be broadcasted to the other sockets in the room", async()=> {
-      ws1.send(JSON.stringify({
-        type: "movement",
+  test("User should not be able to move across the boundary of the wall", async () => {
+    ws1.send(
+      JSON.stringify({
+        type: "move",
         payload: {
-          x: adminX + 1 ,
-          y: adminY,
-          userId: adminUserId
-        }
-      }));
+          x: 10000,
+          y: 100000,
+        },
+      })
+    );
 
-      const message =  await waitForAndPopulatesMessage(ws2Messages);
+    const message = await waitForAndPopulatesMessage(ws1Messages);
 
-      expect(message.type).toBe("movement");
-      expect(message.payload.x).toBe(adminX+1);
-      expect(message.payload.y).toBe(adminY);
+    expect(message.type).toBe("movement-rejected");
+    expect(message.payload.x).toBe(adminX);
+    expect(message.payload.y).toBe(adminY);
 
-      //
-    })
-
-    test("If a user leaves, the other user receives a leave event", async()=> {
-
-      ws1.close();
-
-      const message = await waitForAndPopulatesMessage(ws2Messages);
-      expect(message.type).toBe("user-left");
-      expect(message.payload.userId).toBe(adminUserId);
-
-      //
-    })
+    //
+  });
 
   //
+  test("User should not be able to move two blocks at the same time", async () => {
+    ws1.send(
+      JSON.stringify({
+        type: "move",
+        payload: {
+          x: adminX + 2,
+          y: adminY,
+        },
+      })
+    );
 
+    const message = await waitForAndPopulatesMessage(ws1Messages);
+
+    expect(message.type).toBe("movement-rejected");
+    expect(message.payload.x).toBe(adminX);
+    expect(message.payload.y).toBe(adminY);
+
+    //
+  });
+
+  //
+  //
+  test("Correct movement should be broadcasted to the other sockets in the room", async () => {
+    ws1.send(
+      JSON.stringify({
+        type: "move",
+        payload: {
+          x: adminX + 1,
+          y: adminY,
+          userId: adminUserId,
+        },
+      })
+    );
+
+    const message = await waitForAndPopulatesMessage(ws2Messages);
+
+    expect(message.type).toBe("movement");
+    expect(message.payload.x).toBe(adminX + 1);
+    expect(message.payload.y).toBe(adminY);
+
+    //
+  });
+
+  test("If a user leaves, the other user receives a leave event", async () => {
+    ws1.close();
+
+    const message = await waitForAndPopulatesMessage(ws2Messages);
+    expect(message.type).toBe("user-left");
+    expect(message.payload.userId).toBe(adminUserId);
+
+    //
+  });
+
+  //
 });
+
+// 7:19

@@ -22,10 +22,13 @@ export class User {
   private spaceId?: string;
   private x: number;
   private y: number;
-  constructor(private ws: WebSocket) {
+  private ws: WebSocket;
+  constructor(ws: WebSocket) {
     this.id = getRandomString(10);
     this.x = 0;
     this.y = 0;
+    this.ws = ws;
+    this.initHandler();
   }
 
   initHandler() {
@@ -41,7 +44,7 @@ export class User {
             return;
           }
 
-          this.userId = userId
+          this.userId = userId;
 
           const space = await client.space.findFirst({
             where: {
@@ -69,6 +72,7 @@ export class User {
               users:
                 RoomManager.getInstance()
                   .rooms.get(spaceId)
+                  // ?.filter((x) => x.id !== this.id)
                   ?.map((u) => ({ id: u.id })) ?? [],
             },
           });
@@ -86,7 +90,7 @@ export class User {
             this.spaceId!
           );
 
-          break ;
+          break;
         }
         case "move": {
           const moveX = parsedData.payload.x;
@@ -103,7 +107,7 @@ export class User {
             this.y = moveY;
             RoomManager.getInstance().broadcast(
               {
-                type: "move",
+                type: "movement",
                 payload: {
                   id: this.id,
                   x: this.x,
@@ -129,16 +133,18 @@ export class User {
   }
 
   destroy() {
-
-    RoomManager.getInstance().broadcast({
+    RoomManager.getInstance().broadcast(
+      {
         type: "user-left",
         payload: {
           userId: this.userId,
         },
-    }, this, this.spaceId!);
+      },
+      this,
+      this.spaceId!
+    );
 
-    RoomManager.getInstance().removeUser( this,this.spaceId!);
-
+    RoomManager.getInstance().removeUser(this, this.spaceId!);
   }
 
   send(payload: OutgoingMessage) {
