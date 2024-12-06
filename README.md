@@ -8,7 +8,7 @@ Follow these steps to embark on your Virtual Village journey:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-username/virtual-village-mern-full-stack-game.git
+   git clone https://github.com/nasserml/virtual-village-mern-full-stack-game.git
    ```
 2. **Install Dependencies:**
    ```bash
